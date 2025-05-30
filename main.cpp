@@ -1,3 +1,11 @@
+// Iš teksto sukuria tris failus:
+//   1) word_count.txt       – žodžiai, pasikartojantys daugiau nei vieną kartą, su jų kiekiu
+//   2) cross_reference.txt  – tų žodžių eilučių numeriai
+//   3) urls.txt             – visos rastos URL nuorodos
+
+// Naudojimas:  ./text_sort.exe  input.txt
+// Jei argumentas nepateiktas, programa ieško „input.txt“ tame pačiame aplanke.
+
 #include <cctype>
 #include <fstream>
 #include <iostream>
@@ -34,3 +42,27 @@ const regex WORD_RX(
 const regex URL_RX(
     R"(((?:https?://)?(?:www\.)?[A-Za-z0-9\-_]+\.[A-Za-z]{2,}(?:\.[A-Za-z0-9\-_]+)*(?:[A-Za-z0-9\-/._~%?#=&+]*)?))",
     regex::icase | regex::optimize);
+
+int main(int argc, char *argv[])
+{
+    const string in_name = (argc > 1) ? argv[1] : "input.txt";
+    const string out_cnt = "txt/word_count.txt";
+    const string out_xref = "txt/cross_reference.txt";
+    const string out_url = "txt/urls.txt";
+
+    ifstream in_file(in_name);
+    if (!in_file)
+    {
+        cerr << "Cannot open " << in_name << '\n';
+        return 1;
+    }
+
+    ofstream cnt_file(out_cnt);
+    ofstream xref_file(out_xref);
+    ofstream url_file(out_url);
+    if (!cnt_file || !xref_file || !url_file)
+    {
+        cerr << "Cannot create output files\n";
+        return 1;
+    }
+}
