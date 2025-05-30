@@ -65,4 +65,29 @@ int main(int argc, char *argv[])
         cerr << "Cannot create output files\n";
         return 1;
     }
+
+    // map'ai raktus laiko surikiuotus -> gražesnė išvestis
+    std::map<string, size_t> word_count;
+    std::map<string, set<int>> word_lines;
+    set<string> urls;
+
+    string line;
+    int line_no = 0;
+
+    while (getline(in_file, line))
+    {
+        ++line_no;
+
+        // ieškome žodžių
+        for (sregex_iterator it(line.begin(), line.end(), WORD_RX), end; it != end; ++it)
+        {
+            const string w = to_lower_ascii(it->str());
+            ++word_count[w];
+            word_lines[w].insert(line_no);
+        }
+
+        // ieškome URL
+        for (sregex_iterator it(line.begin(), line.end(), URL_RX), end; it != end; ++it)
+            urls.insert(it->str());
+    }
 }
