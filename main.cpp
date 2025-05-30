@@ -113,6 +113,6 @@ int main(int argc, char *argv[])
 
     cout << "Baigta.  "
          << word_count.size() << " unikalus zodziai, "
-         << urls.size() << " URL'u.\n";
+         << urls.size() << " URL.\n";
     return 0;
 }

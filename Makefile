@@ -1,5 +1,6 @@
 main:
 	g++ -o text_sort.exe main.cpp
+	mkdir txt
 
 clean:
-	rm -f text_sort.exe txt/*
+	rm -rf text_sort.exe txt
