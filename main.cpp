@@ -90,4 +90,29 @@ int main(int argc, char *argv[])
         for (sregex_iterator it(line.begin(), line.end(), URL_RX), end; it != end; ++it)
             urls.insert(it->str());
     }
+
+    // word_count.txt
+    for (const auto &[w, cnt] : word_count)
+        if (cnt > 1)
+            cnt_file << w << " : " << cnt << '\n';
+
+    // cross_reference.txt
+    for (const auto &[w, lines] : word_lines)
+    {
+        if (word_count[w] <= 1)
+            continue;
+        xref_file << w << " : ";
+        for (int n : lines)
+            xref_file << n << ' ';
+        xref_file << '\n';
+    }
+
+    // urls.txt
+    for (const string &u : urls)
+        url_file << u << '\n';
+
+    cout << "Baigta.  "
+         << word_count.size() << " unikalus zodziai, "
+         << urls.size() << " URL'u.\n";
+    return 0;
 }
