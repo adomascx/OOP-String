@@ -24,27 +24,28 @@ using std::set;
 using std::sregex_iterator;
 using std::string;
 
-// Paverčia ASCII raides į mažąsias, o UTF-8 baitus palieka nepaliestus
+// Konvertuoja ASCII raides į mažąsias, o UTF-8 baitus palieka nepaliestus
 string to_lower_ascii(string s)
 {
     for (char &ch : s)
         if (ch < 128)
-            ch = static_cast<unsigned char>(tolower(ch));
+            ch = static_cast<unsigned char>(tolower(static_cast<unsigned char>(ch)));
     return s;
 }
 
-// Raidės (anglų ir lietuvių)
+// Regex šablonas, atrenkantis žodžius, sudarytus iš ASCII raidžių ir lietuviškų simbolių
 const regex WORD_RX(
     R"(([[:alpha:]ĄČĘĖĮŠŲŪŽąčęėįšųūž]+))",
     regex::icase | regex::optimize);
 
-// http://pavyzdys, https://pavyzdys, www.pavyzdys, pavyzdys.lt/…
+// http://pavyzdys, https://pavyzdys, www.pavyzdys, pavyzdys.lt/… 
 const regex URL_RX(
-    R"(((?:https?://)?(?:www\.)?[A-Za-z0-9\-_]+\.[A-Za-z]{2,}(?:\.[A-Za-z0-9\-_]+)*(?:[A-Za-z0-9\-/._~%?#=&+]*)?))",
+    R"(((?:https?://)?(?:www\.)?(?:[A-Za-z0-9\-_]+\.[A-Za-z]{2,}(?:\.[A-Za-z0-9\-_]+)*|(?:\d{1,3}\.){3}\d{1,3})(?:[A-Za-z0-9\-/._~%?#=&+]*)?))",
     regex::icase | regex::optimize);
 
 int main(int argc, char *argv[])
 {
+    // Nustato įvesties failo pavadinimą: jei pateiktas pirmasis komandinės eilutės argumentas, naudojamas jis, kitu atveju numatomas "input.txt".
     const string in_name = (argc > 1) ? argv[1] : "input.txt";
     const string out_cnt = "txt/word_count.txt";
     const string out_xref = "txt/cross_reference.txt";
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
     {
         ++line_no;
 
-        // ieškome žodžių
+        // Ieškome žodžių
         for (sregex_iterator it(line.begin(), line.end(), WORD_RX), end; it != end; ++it)
         {
             const string w = to_lower_ascii(it->str());
@@ -86,12 +87,13 @@ int main(int argc, char *argv[])
             word_lines[w].insert(line_no);
         }
 
-        // ieškome URL
+        // Ieškome URL
         for (sregex_iterator it(line.begin(), line.end(), URL_RX), end; it != end; ++it)
             urls.insert(it->str());
     }
 
     // word_count.txt
+    // Naudojami "structured bindings" (auto &[w, cnt]), iteruojant per map'o raktų ir reikšmių poras.
     for (const auto &[w, cnt] : word_count)
         if (cnt > 1)
             cnt_file << w << " : " << cnt << '\n';
